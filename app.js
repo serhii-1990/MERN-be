@@ -1,9 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const placesRoutes = require("./routes/places-routs");
 const usersRoutes = require("./routes/users-routs");
-const HttpError = require("./model/http-error");
+const HttpError = require("./models/http-error");
 
 const app = express();
 
@@ -26,4 +27,13 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknow error occured!" });
 });
 
-app.listen(5000);
+mongoose
+  .connect(
+    "mongodb+srv://mern-admin:mIXwtGLY8MpHjiYm@mern-max-nc8dj.mongodb.net/places?retryWrites=true&w=majority"
+  )
+  .then(() => {
+    app.listen(5000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });

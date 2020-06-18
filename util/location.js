@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const HttpError = require("../model/http-error");
+const HttpError = require("../models/http-error");
 const API = "AIzaSyA1-XMtJivnfNK7epig031Fbojf071wBfg";
 
 const getCoordsForAddress = (address) => {
