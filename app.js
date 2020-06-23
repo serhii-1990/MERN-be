@@ -29,7 +29,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    "mongodb+srv://mern-admin:mIXwtGLY8MpHjiYm@mern-max-nc8dj.mongodb.net/places?retryWrites=true&w=majority"
+    "mongodb+srv://mern-admin:pLMrTGa3qGUkfrxy@mern-max-nc8dj.mongodb.net/places?retryWrites=true&w=majority"
   )
   .then(() => {
     app.listen(5000);
@@ -37,3 +37,5 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
+
+// pLMrTGa3qGUkfrxy
