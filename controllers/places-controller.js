@@ -47,7 +47,7 @@ const getPlacesByUserId = async (req, res, next) => {
   }
 
   res.json({
-    plases: userWithPlaces.places.map((place) =>
+    places: userWithPlaces.places.map((place) =>
       place.toObject({ getters: true })
     ),
   });
