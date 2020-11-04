@@ -1,8 +1,8 @@
 node_modules
-secrets
+secrets/*
 notes.txt
 # exclude everything
-uploads/images*
+uploads/images/*
 
 # exception to the rule
 !uploads/images/.gitkeep 
