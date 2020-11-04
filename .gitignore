@@ -6,3 +6,4 @@ uploads/images/*
 
 # exception to the rule
 !uploads/images/.gitkeep 
+!secrets/.gitkeep
