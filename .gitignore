@@ -1,9 +1,9 @@
 node_modules
-secrets/*
 notes.txt
+nodemon.json
+
 # exclude everything
 uploads/images/*
 
 # exception to the rule
 !uploads/images/.gitkeep 
-!secrets/.gitkeep

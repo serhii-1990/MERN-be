@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const HttpError = require('../models/http-error');
-const Secrets = require('../secrets');
 
 module.exports = (req, res, next) => {
   if (req.method === 'OPTIONS') {
@@ -11,7 +10,7 @@ module.exports = (req, res, next) => {
     if (!token) {
       throw new Error('Authentication feild!');
     }
-    const decodedToken = jwt.verify(token, Secrets.jwtKey);
+    const decodedToken = jwt.verify(token, `${process.env.JWT_KEY}`);
     req.userData = { userId: decodedToken.userId };
     next();
   } catch (err) {
