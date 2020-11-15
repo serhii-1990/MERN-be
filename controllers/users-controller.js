@@ -1,16 +1,18 @@
-const HttpError = require("../models/http-error");
-// const { v4: uuidv4 } = require("uuid");
-const { validationResult } = require("express-validator");
-const User = require("../models/user");
+const { validationResult } = require('express-validator');
+const bcrypt = require('bcrypt');
+
+const HttpError = require('../models/http-error');
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
 
 const getUsers = async (req, res, next) => {
   let users;
 
   try {
-    users = await User.find({}, "-password");
+    users = await User.find({}, '-password');
   } catch (err) {
     const error = new HttpError(
-      "Fetching users failed, please try agein later",
+      'Fetching users failed, please try agein later',
       500
     );
     return next(error);
@@ -24,7 +26,7 @@ const signupUser = async (req, res, next) => {
 
   if (!errors.isEmpty()) {
     return next(
-      new HttpError("Invalid inputs passed pleace check your data.", 422)
+      new HttpError('Invalid inputs passed pleace check your data.', 422)
     );
   }
 
@@ -36,33 +38,57 @@ const signupUser = async (req, res, next) => {
     existingUser = await User.findOne({ email: email });
   } catch (err) {
     const error = new HttpError(
-      "Something went wrong, could not find a user",
+      'Signing up failed please try again later.',
       500
     );
     return next(error);
   }
 
   if (existingUser) {
-    const error = new HttpError("User already exists. Log in insted.", 422);
+    const error = new HttpError('User already exists. Log in insted.', 422);
     return next(error);
   }
 
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError('Could not create, please try again.', 500);
+    return next(error);
+  }
   const createdUser = new User({
     name,
     email,
     image: req.file.path,
-    password,
+    password: hashedPassword,
     places: [],
   });
 
   try {
     await createdUser.save();
   } catch (err) {
-    const error = new HttpError("Creating user failed, please try again.", 500);
+    const error = new HttpError(
+      'Signing up failed please try again later.',
+      500
+    );
     return next(error);
   }
 
-  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: createdUser.id, email: createdUser.email },
+      `${process.env.JWT_KEY}`,
+      { expiresIn: '1h' }
+    );
+  } catch (err) {
+    const error = new HttpError('Creating user failed, please try again.', 500);
+    return next(error);
+  }
+
+  res
+    .status(201)
+    .json({ userId: createdUser.id, email: createdUser.email, token: token });
 };
 
 const logIn = async (req, res, next) => {
@@ -74,20 +100,55 @@ const logIn = async (req, res, next) => {
     existingUser = await User.findOne({ email: email });
   } catch (err) {
     const error = new HttpError(
-      "Logging in failed, please try again latter",
+      'Logging in failed, please try again latter 100',
       500
     );
     next(error);
   }
 
-  if (!existingUser || existingUser.password !== password) {
-    const error = new HttpError("Invalid credentials, could not log in", 401);
+  if (!existingUser) {
+    const error = new HttpError('Invalid credentials, could not log in', 401);
+    return next(error);
+  }
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    const error = new HttpError(
+      'Could not log you in, please check your credentials and try again.',
+      500
+    );
+    return next(error);
+  }
+
+  if (!isValidPassword) {
+    const error = new HttpError(
+      'Invalid credentials, could not log you in.',
+      401
+    );
+    return next(error);
+  }
+
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: existingUser.id, email: existingUser.email },
+      `${process.env.JWT_KEY}`,
+      { expiresIn: '1h' }
+    );
+  } catch (err) {
+    const error = new HttpError(
+      'Logging user failed, please try again. 142',
+      500
+    );
     return next(error);
   }
 
   res.json({
-    message: "Logged in.",
-    user: existingUser.toObject({ getters: true }),
+    userId: existingUser.id,
+    email: existingUser.email,
+    token: token,
   });
 };
 

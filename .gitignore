@@ -1,1 +1,9 @@
 node_modules
+notes.txt
+nodemon.json
+
+# exclude everything
+uploads/images/*
+
+# exception to the rule
+!uploads/images/.gitkeep 
