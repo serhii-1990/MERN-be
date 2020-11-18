@@ -1,0 +1,8 @@
+{
+  "env": {
+    "DB_USER": "mern-admin",
+    "DB_PASSWORD": "ZUTIwK68z3vKDw0w",
+    "DB_NAME": "places",
+    "JWT_KEY": "jwtKey"
+  }
+}
